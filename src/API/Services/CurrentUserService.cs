@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using API.Auth;
 using Application.Common.Interfaces;
 
 namespace API.Services;
@@ -7,6 +8,10 @@ public class CurrentUserService(IHttpContextAccessor accessor) : ICurrentUserSer
 {
     private ClaimsPrincipal? Principal => accessor.HttpContext?.User;
 
-    public Guid? UserId => Guid.TryParse(Principal?.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
-    public Guid? TenantId => Guid.TryParse(Principal?.FindFirstValue("tenant_id"), out var id) ? id : null;
+    public Guid? UserId => Read(AppClaims.UserId);
+    public Guid? TenantId => Read(AppClaims.TenantId);
+    public bool IsAuthenticated => Principal?.Identity?.IsAuthenticated == true;
+
+    private Guid? Read(string claim)
+        => Guid.TryParse(Principal?.FindFirstValue(claim), out var id) ? id : null;
 }
