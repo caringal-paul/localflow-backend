@@ -1,3 +1,4 @@
+using Application.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,8 +11,8 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         // Feature services
-        // services.AddScoped<IOrderService, OrderService>();
-        // services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
+
 
         return services;
     }

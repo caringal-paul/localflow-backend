@@ -9,7 +9,7 @@ namespace Infrastructure.Persistence;
 
 public class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
-    ICurrentUserService currentUser) : DbContext(options)
+    ICurrentUserService currentUser) : DbContext(options), IUnitOfWork
 {
     // Instance property so EF parameterizes the filter per context instance
     private Guid? CurrentTenantId => currentUser.TenantId;
