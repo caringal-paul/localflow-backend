@@ -1,8 +1,7 @@
 using System.Security.Claims;
-using Application.Common.Interfaces;
+using Application.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Auth;
 
@@ -15,10 +14,8 @@ public static class SessionValidator
 
         if (Guid.TryParse(context.Principal?.FindFirstValue(AppClaims.UserId), out var userId))
         {
-            var db = context.HttpContext.RequestServices.GetRequiredService<IApplicationDbContext>();
-            valid = await db.Users.AnyAsync(
-                u => u.Id == userId && u.IsActive && u.SecurityStamp == stamp,
-                context.HttpContext.RequestAborted);
+            var users = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+            valid = await users.IsSessionValidAsync(userId, stamp, context.HttpContext.RequestAborted);
         }
 
         if (!valid)
