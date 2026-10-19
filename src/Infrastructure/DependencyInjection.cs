@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Roles;
 using Application.TenantMembers;
 using Application.Users;
 using Infrastructure.Persistence;
@@ -15,7 +16,6 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ITenantMemberRepository, TenantMemberRepository>();
         services.AddSingleton<IPasswordService, PasswordService>();
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -27,6 +27,8 @@ public static class DependencyInjection
             // Repositories (only if we adopt them)
             // services.AddScoped<IOrderRepository, OrderRepository>();
             // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

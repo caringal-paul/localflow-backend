@@ -1,17 +1,21 @@
 using API;
+using API.Logging;
 using API.Middleware;
 using Application;
 using Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApi(builder.Configuration, builder.Environment);
+builder.Host.UseApiLogging();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 app.UseStatusCodePages(StatusCodeResponseWriter.WriteAsync);
 
 app.UseHttpsRedirection();
