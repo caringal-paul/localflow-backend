@@ -18,6 +18,14 @@ app.UseHttpsRedirection();
 
 // CORS, Authentication, Authorization, tenant middleware go here (next steps)
 app.UseCors("AllowFrontend");
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
