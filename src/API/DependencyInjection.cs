@@ -73,6 +73,9 @@ public static class DependencyInjection
             .RequireAuthenticatedUser()
             .Build());
 
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();    
+
         return services;
     }
 }
