@@ -1,4 +1,5 @@
 using Application.Auth;
+using Application.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +13,7 @@ public static class DependencyInjection
 
         // Feature services
         services.AddScoped<IAuthService, AuthService>();
-
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

@@ -6,6 +6,8 @@ using API.Services;
 using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using API.Logging;
+using Serilog.Core;
 
 namespace API;
 
@@ -42,6 +44,8 @@ public static class DependencyInjection
             .AddJsonOptions(o => ApiJson.Configure(o.JsonSerializerOptions));
 
         services.AddHttpContextAccessor();
+        services.AddHttpContextAccessor();
+        services.AddSingleton<ILogEventEnricher, CurrentUserEnricher>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
