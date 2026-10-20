@@ -1,6 +1,7 @@
 using Application.Common.Responses;
 using Application.Users;
 using Application.Users.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;

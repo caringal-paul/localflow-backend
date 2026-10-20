@@ -24,6 +24,7 @@ public static class DependencyInjection
                     o => o.UseNetTopologySuite())
                 .UseSnakeCaseNamingConvention());
 
+        services.AddScoped<DbSeeder>();
             // Repositories (only if we adopt them)
             // services.AddScoped<IOrderRepository, OrderRepository>();
             // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
