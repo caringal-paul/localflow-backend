@@ -5,6 +5,7 @@ namespace Domain.Entities;
 public class User : BaseEntity
 {
     public string Email { get; set; } = string.Empty;
+    public string Code { get; set; } = null!;
     public string? PasswordHash { get; set; }
     public string? SecurityStamp { get; set; }
     public string FirstName { get; set; } = string.Empty;

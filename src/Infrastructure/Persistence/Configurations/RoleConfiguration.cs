@@ -11,6 +11,16 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         // Tenant roles
         builder.HasIndex(r => new { r.TenantId, r.Name }).IsUnique().HasFilter(SqlFilters.NotDeleted);
 
+        builder.Property(r => r.Code).HasMaxLength(64);
+
+        builder.HasIndex(r => new { r.TenantId, r.Code })
+            .IsUnique()
+            .HasFilter("is_deleted = false AND tenant_id IS NOT NULL");
+
+        builder.HasIndex(r => r.Code)
+            .IsUnique()
+            .HasFilter("is_deleted = false AND tenant_id IS NULL");
+
         // System roles (TenantId null): Postgres treats NULLs as distinct, so enforce separately
         builder.HasIndex(r => r.Name)
             .IsUnique()

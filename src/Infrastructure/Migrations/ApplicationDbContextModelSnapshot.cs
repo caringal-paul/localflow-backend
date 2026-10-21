@@ -24,6 +24,9 @@ namespace Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence("user_code_seq")
+                .StartsAt(10001L);
+
             modelBuilder.Entity("Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -979,6 +982,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("code");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -1025,10 +1034,20 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_roles");
 
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_roles_code")
+                        .HasFilter("is_deleted = false AND tenant_id IS NULL");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_roles_name_system")
                         .HasFilter("tenant_id IS NULL AND is_deleted = false");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_roles_tenant_id_code")
+                        .HasFilter("is_deleted = false AND tenant_id IS NOT NULL");
 
                     b.HasIndex("TenantId", "Name")
                         .IsUnique()
@@ -1191,6 +1210,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("code");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -1246,6 +1271,11 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_tenant_members_user_id");
 
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tenant_members_tenant_id_code")
+                        .HasFilter("is_deleted = false");
+
                     b.HasIndex("TenantId", "UserId")
                         .IsUnique()
                         .HasDatabaseName("ix_tenant_members_tenant_id_user_id")
@@ -1264,6 +1294,14 @@ namespace Infrastructure.Migrations
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("text")
                         .HasColumnName("avatar_url");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("code")
+                        .HasDefaultValueSql("'USR-' || nextval('user_code_seq')");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1332,6 +1370,11 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_code")
+                        .HasFilter("is_deleted = false");
 
                     b.HasIndex("Email")
                         .IsUnique()

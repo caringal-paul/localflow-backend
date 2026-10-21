@@ -54,6 +54,8 @@ public class ApplicationDbContext(
     {
         base.OnModelCreating(builder);
 
+        builder.HasSequence<long>("user_code_seq").StartsAt(10001);
+
         builder.HasPostgresExtension("postgis");
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
