@@ -13,26 +13,26 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
 
     public async Task SeedRolesAsync(CancellationToken ct)
     {
-        var roles = new (Guid Id, string Name, string Description, string[] Permissions)[]
-        {
-            (OwnerRoleId, "Owner", "Full access",
-                ["orders.view", "orders.create", "orders.update", "orders.cancel",
-                 "customers.view", "customers.manage", "products.view", "products.manage",
-                 "users.view", "users.manage", "dashboard.view", "settings.manage"]),
-            (AdminRoleId, "Admin", "All except tenant settings",
-                ["orders.view", "orders.create", "orders.update", "orders.cancel",
-                 "customers.view", "customers.manage", "products.view", "products.manage",
-                 "users.view", "users.manage", "dashboard.view"]),
-            (StaffRoleId, "Staff", "Orders, customers, products (view/create)",
-                ["orders.view", "orders.create", "customers.view", "products.view", "dashboard.view"]),
-            (RiderRoleId, "Rider", "Rider app access", [])
-        };
+            var roles = new (Guid Id, string Code, string Name, string Description, string[] Permissions)[]
+            {
+                (OwnerRoleId, "owner", "Owner", "Full access",
+                    ["orders.view", "orders.create", "orders.update", "orders.cancel",
+                    "customers.view", "customers.manage", "products.view", "products.manage",
+                    "users.view", "users.manage", "dashboard.view", "settings.manage"]),
+                (AdminRoleId, "admin", "Admin", "All except tenant settings",
+                    ["orders.view", "orders.create", "orders.update", "orders.cancel",
+                    "customers.view", "customers.manage", "products.view", "products.manage",
+                    "users.view", "users.manage", "dashboard.view"]),
+                (StaffRoleId, "staff", "Staff", "Orders, customers, products (view/create)",
+                    ["orders.view", "orders.create", "customers.view", "products.view", "dashboard.view"]),
+                (RiderRoleId, "rider", "Rider", "Rider app access", [])
+            };
 
-        foreach (var (id, name, description, permissions) in roles)
+            foreach (var (id, code, name, description, permissions) in roles)
         {
             if (!await db.Roles.IgnoreQueryFilters().AnyAsync(r => r.Id == id, ct))
             {
-                db.Roles.Add(new Role { Id = id, TenantId = null, Name = name, Description = description, IsSystem = true });
+                db.Roles.Add(new Role { Id = id, TenantId = null,Code = code, Name = name, Description = description, IsSystem = true });
             }
 
             var existing = await db.RolePermissions.IgnoreQueryFilters()
@@ -81,10 +81,29 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
             Id = Guid.CreateVersion7(),
             TenantId = tenant.Id,
             UserId = user.Id,
+            Code = "MBR-0001",
             IsActive = true,
             JoinedAt = DateTimeOffset.UtcNow
         };
 
+        foreach (var (key, prefix, next) in new[]
+        {
+            ("Member", "MBR-", 2L),   // MBR-0001 is assigned manually to the seeded owner
+            ("Customer", "CUS-", 1L),
+            ("Order", "ORD-", 1L)
+        })
+        {
+            db.DocumentSequences.Add(new DocumentSequence
+            {
+                Id = Guid.CreateVersion7(),
+                TenantId = tenant.Id,
+                SequenceKey = key,
+                Prefix = prefix,
+                NextValue = next,
+                Padding = 4
+            });
+        }
+        
         db.Tenants.Add(tenant);
         db.Users.Add(user);
         db.TenantMembers.Add(member);

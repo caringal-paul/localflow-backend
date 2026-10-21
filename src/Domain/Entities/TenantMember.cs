@@ -7,6 +7,7 @@ public class TenantMember : BaseEntity, ITenantEntity
 {
     public Guid TenantId { get; set; }
     public Guid UserId { get; set; }
+    public string Code { get; set; } = null!;
     public bool IsActive { get; set; }
     public DateTimeOffset JoinedAt { get; set; }
     public Guid? InvitedBy { get; set; }

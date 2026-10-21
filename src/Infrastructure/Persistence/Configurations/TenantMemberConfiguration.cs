@@ -10,6 +10,12 @@ public class TenantMemberConfiguration : IEntityTypeConfiguration<TenantMember>
     {
         builder.HasIndex(m => new { m.TenantId, m.UserId }).IsUnique().HasFilter(SqlFilters.NotDeleted);
 
+        builder.Property(m => m.Code).HasMaxLength(32);
+
+        builder.HasIndex(m => new { m.TenantId, m.Code })
+            .IsUnique()
+            .HasFilter(SqlFilters.NotDeleted);
+
         builder.HasOne(m => m.Tenant)
             .WithMany(t => t.Members)
             .HasForeignKey(m => m.TenantId);

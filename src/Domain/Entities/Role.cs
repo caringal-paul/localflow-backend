@@ -6,6 +6,7 @@ public class Role : BaseEntity
 {
     public Guid? TenantId { get; set; } // null = system role
     public string Name { get; set; } = string.Empty;
+    public string Code { get; set; } = null!;
     public string? Description { get; set; }
     public bool IsSystem { get; set; }
 

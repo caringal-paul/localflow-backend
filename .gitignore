@@ -7,6 +7,10 @@
 .env.*
 !.env.example
 
+
+# Todo
+todo.ts
+
 # User-specific files
 *.rsuser
 *.suo
