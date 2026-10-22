@@ -1,0 +1,43 @@
+Phase 1 to-do (in order)
+
+Done
+
+Cookie auth, SessionValidator, seeding, entity codes, permissions ([HasPermission])
+
+1. Foundation (unblocks everything)
+
+Add Phase 1 Permissions constants to the seeder (replace the string literals)
+IDocumentNumberGenerator (Customer, Order, Member codes)
+Tenant Active and member is_active check in SessionValidator
+
+2. Customers (with addresses)
+
+CRUD, search, GET /customers/{code}
+Addresses as owned children, with one default per customer
+
+3. Products (with categories)
+
+CRUD, GET /products/{sku}
+Category tree (parent_id)
+
+4. Orders (with items and events)
+
+Create: address and product snapshots, totals, order_number, tracking_token, first order_event
+Status transitions in one place (Draft → Pending → Confirmed → Completed, or Cancelled), one order_event per change
+List with filters, GET /orders/{orderNumber}
+
+5. Basic dashboard
+
+Counts by order status, recent orders
+
+6. Backlog (parallel, low priority)
+
+Tenant switching endpoint
+Registration and invitations
+Error catalog xUnit test
+Decide on UniqueConstraintErrors
+Update Microsoft.OpenApi (NU1903)
+Test a second Staff member against permissions
+Login lockout (optional)
+
+Milestone: log in → create customer → create products → create order → manage order.
