@@ -19,4 +19,5 @@ public class Customer : BaseEntity, ITenantEntity
     public Tenant Tenant { get; set; } = null!;
     public ICollection<CustomerAddress> Addresses { get; set; } = [];
     public ICollection<Order> Orders { get; set; } = [];
+    public CustomerPreference? Preference { get; set; }
 }
