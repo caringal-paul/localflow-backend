@@ -85,6 +85,25 @@ public class CustomerService(
         return address.ToDto();
     }
 
+    public async Task<CustomerPreferenceDto> UpdatePreferencesAsync(string code, SaveCustomerPreferenceRequest request, CancellationToken ct)
+    {
+        var customer = await customers.GetByCodeForUpdateAsync(code, ct) ?? throw new AppException(CustomerErrors.NotFound);
+
+        var preference = customer.Preference;
+        if (preference is null)
+        {
+            preference = new CustomerPreference { Id = Guid.CreateVersion7(), CustomerId = customer.Id };
+            await customers.AddPreferenceAsync(preference, ct);
+        }
+
+        preference.AllowEmail = request.AllowEmail;
+        preference.AllowSms = request.AllowSms;
+        preference.AllowPush = request.AllowPush;
+
+        await unitOfWork.SaveChangesAsync(ct);
+        return preference.ToDto();
+    }
+
     public async Task DeleteAddressAsync(string code, Guid addressId, CancellationToken ct)
     {
         var customer = await customers.GetByCodeForUpdateAsync(code, ct) ?? throw new AppException(CustomerErrors.NotFound);

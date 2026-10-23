@@ -13,8 +13,12 @@ public static class CustomerMapper
         Id = c.Id, Code = c.Code, FullName = c.FullName, CompanyName = c.CompanyName,
         Email = c.Email, Phone = c.Phone, AlternatePhone = c.AlternatePhone, Notes = c.Notes,
         IsActive = c.IsActive,
+        Preferences = c.Preference?.ToDto() ?? CustomerPreferenceDto.Default,
         Addresses = c.Addresses.OrderByDescending(a => a.IsDefault).Select(a => a.ToDto()).ToList()
     };
+
+    public static CustomerPreferenceDto ToDto(this CustomerPreference p) =>
+        new(p.AllowEmail, p.AllowSms, p.AllowPush);
 
     public static CustomerAddressDto ToDto(this CustomerAddress a) => new()
     {
