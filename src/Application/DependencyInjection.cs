@@ -1,4 +1,5 @@
 using Application.Auth;
+using Application.Customers;
 using Application.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,8 @@ public static class DependencyInjection
         // Feature services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
         return services;
     }

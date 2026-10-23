@@ -1,4 +1,6 @@
+using Application.Auth;
 using Application.Common.Interfaces;
+using Application.Customers;
 using Application.Roles;
 using Application.TenantMembers;
 using Application.Users;
@@ -28,8 +30,13 @@ public static class DependencyInjection
             // Repositories (only if we adopt them)
             // services.AddScoped<IOrderRepository, OrderRepository>();
             // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
-        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IDocumentNumberGenerator, DocumentNumberGenerator>();
+
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ITenantMemberRepository, TenantMemberRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
 
         return services;
     }
