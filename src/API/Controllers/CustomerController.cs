@@ -42,6 +42,10 @@ public class CustomersController(ICustomerService customers) : ControllerBase
     public async Task<IActionResult> UpdateAddress(string code, Guid addressId, SaveCustomerAddressRequest request, CancellationToken ct) =>
         Ok(ApiResponse.Ok(await customers.UpdateAddressAsync(code, addressId, request, ct)));
 
+    [HttpPut("{code}/preferences"), HasPermission(Permissions.CustomersManage)]
+    public async Task<IActionResult> UpdatePreferences(string code, SaveCustomerPreferenceRequest request, CancellationToken ct) =>
+        Ok(ApiResponse.Ok(await customers.UpdatePreferencesAsync(code, request, ct)));
+
     [HttpDelete("{code}/addresses/{addressId:guid}"), HasPermission(Permissions.CustomersManage)]
     public async Task<IActionResult> DeleteAddress(string code, Guid addressId, CancellationToken ct)
     {

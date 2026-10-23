@@ -30,17 +30,24 @@ public class CustomerRepository(ApplicationDbContext db) : ICustomerRepository
     }
 
     public Task<Customer?> GetByCodeAsync(string code, CancellationToken ct) =>
-        db.Customers.AsNoTracking().Include(c => c.Addresses).FirstOrDefaultAsync(c => c.Code == code, ct);
+        db.Customers.AsNoTracking()
+            .Include(c => c.Addresses)
+            .Include(c => c.Preference)
+            .FirstOrDefaultAsync(c => c.Code == code, ct);
 
     public Task<Customer?> GetByCodeForUpdateAsync(string code, CancellationToken ct) =>
-        db.Customers.Include(c => c.Addresses).FirstOrDefaultAsync(c => c.Code == code, ct);
+        db.Customers
+            .Include(c => c.Addresses)
+            .Include(c => c.Preference)
+            .FirstOrDefaultAsync(c => c.Code == code, ct);
+
+    public async Task AddPreferenceAsync(CustomerPreference preference, CancellationToken ct) =>
+        await db.CustomerPreferences.AddAsync(preference, ct);
 
     public async Task AddAsync(Customer customer, CancellationToken ct) => await db.Customers.AddAsync(customer, ct);
 
     public void Remove(Customer customer) => db.Customers.Remove(customer);
 
-    // Added through the DbSet, not customer.Addresses. A new entity with a preset Guid key,
-    // found through a tracked parent's collection, is treated as Modified (UPDATE) instead of Added.
     public async Task AddAddressAsync(CustomerAddress address, CancellationToken ct) =>
         await db.CustomerAddresses.AddAsync(address, ct);
 

@@ -12,6 +12,8 @@ public sealed record CustomerDto
     public string? Phone { get; init; }
     public string? AlternatePhone { get; init; }
     public string? Notes { get; init; }
+    public required CustomerPreferenceDto Preferences { get; init; }
+
     public required bool IsActive { get; init; }
     public required IReadOnlyList<CustomerAddressDto> Addresses { get; init; }
 }

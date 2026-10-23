@@ -12,5 +12,6 @@ public interface ICustomerService
     Task DeleteAsync(string code, CancellationToken ct);
     Task<CustomerAddressDto> AddAddressAsync(string code, SaveCustomerAddressRequest request, CancellationToken ct);
     Task<CustomerAddressDto> UpdateAddressAsync(string code, Guid addressId, SaveCustomerAddressRequest request, CancellationToken ct);
+    Task<CustomerPreferenceDto> UpdatePreferencesAsync(string code, SaveCustomerPreferenceRequest request, CancellationToken ct);
     Task DeleteAddressAsync(string code, Guid addressId, CancellationToken ct);
 }

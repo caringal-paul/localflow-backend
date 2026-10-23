@@ -7,8 +7,7 @@ public sealed record SaveCustomerRequest
     public string? Email { get; init; }
     public string? Phone { get; init; }
     public string? AlternatePhone { get; init; }
+    public required CustomerPreferenceDto Preferences { get; init; }
     public string? Notes { get; init; }
-    public bool AllowEmail { get; init; } = true;
-    public bool AllowSms { get; init; } = true;
     public bool IsActive { get; init; } = true;
 }

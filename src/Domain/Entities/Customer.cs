@@ -13,7 +13,6 @@ public class Customer : BaseEntity, ITenantEntity
     public string? Phone { get; set; }
     public string? AlternatePhone { get; set; }
     public string? Notes { get; set; }
-    public NotificationChannels AllowedChannels { get; set; }
     public bool IsActive { get; set; }
 
     public Tenant Tenant { get; set; } = null!;
