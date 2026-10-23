@@ -1,3 +1,5 @@
+using Application.Auth;
+using Application.Common;
 using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -11,28 +13,50 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
     private static readonly Guid StaffRoleId = Guid.Parse("0190f000-0000-7000-8000-000000000003");
     private static readonly Guid RiderRoleId = Guid.Parse("0190f000-0000-7000-8000-000000000004");
 
+    private static readonly string[] StaffPermissions =
+    [
+        Permissions.OrdersView, Permissions.OrdersCreate,
+        Permissions.CustomersView, Permissions.ProductsView,
+        Permissions.DashboardView
+    ];
+
+    private static readonly string[] AdminPermissions =
+    [
+        ..StaffPermissions,
+        Permissions.OrdersUpdate, Permissions.OrdersCancel,
+        Permissions.CustomersManage, Permissions.ProductsManage,
+        Permissions.UsersView, Permissions.UsersManage
+    ];
+
+    private static readonly string[] OwnerPermissions =
+    [
+        ..AdminPermissions,
+        Permissions.SettingsManage
+    ];
+
     public async Task SeedRolesAsync(CancellationToken ct)
     {
-            var roles = new (Guid Id, string Code, string Name, string Description, string[] Permissions)[]
-            {
-                (OwnerRoleId, "owner", "Owner", "Full access",
-                    ["orders.view", "orders.create", "orders.update", "orders.cancel",
-                    "customers.view", "customers.manage", "products.view", "products.manage",
-                    "users.view", "users.manage", "dashboard.view", "settings.manage"]),
-                (AdminRoleId, "admin", "Admin", "All except tenant settings",
-                    ["orders.view", "orders.create", "orders.update", "orders.cancel",
-                    "customers.view", "customers.manage", "products.view", "products.manage",
-                    "users.view", "users.manage", "dashboard.view"]),
-                (StaffRoleId, "staff", "Staff", "Orders, customers, products (view/create)",
-                    ["orders.view", "orders.create", "customers.view", "products.view", "dashboard.view"]),
-                (RiderRoleId, "rider", "Rider", "Rider app access", [])
-            };
+        var roles = new (Guid Id, string Code, string Name, string Description, string[] Permissions)[]
+        {
+            (OwnerRoleId, "owner", "Owner", "Full access", OwnerPermissions),
+            (AdminRoleId, "admin", "Admin", "All except tenant settings", AdminPermissions),
+            (StaffRoleId, "staff", "Staff", "Orders, customers, products (view/create)", StaffPermissions),
+            (RiderRoleId, "rider", "Rider", "Rider app access", [])
+        };
 
-            foreach (var (id, code, name, description, permissions) in roles)
+        foreach (var (id, code, name, description, permissions) in roles)
         {
             if (!await db.Roles.IgnoreQueryFilters().AnyAsync(r => r.Id == id, ct))
             {
-                db.Roles.Add(new Role { Id = id, TenantId = null,Code = code, Name = name, Description = description, IsSystem = true });
+                db.Roles.Add(new Role
+                {
+                    Id = id,
+                    TenantId = null,
+                    Code = code,
+                    Name = name,
+                    Description = description,
+                    IsSystem = true
+                });
             }
 
             var existing = await db.RolePermissions.IgnoreQueryFilters()
@@ -42,7 +66,12 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
 
             foreach (var permission in permissions.Except(existing))
             {
-                db.RolePermissions.Add(new RolePermission { Id = Guid.CreateVersion7(), RoleId = id, Permission = permission });
+                db.RolePermissions.Add(new RolePermission
+                {
+                    Id = Guid.CreateVersion7(),
+                    RoleId = id,
+                    Permission = permission
+                });
             }
         }
 
@@ -86,12 +115,30 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
             JoinedAt = DateTimeOffset.UtcNow
         };
 
-        foreach (var (key, prefix, next) in new[]
+        var customer = new Customer
         {
-            ("Member", "MBR-", 2L),   // MBR-0001 is assigned manually to the seeded owner
-            ("Customer", "CUS-", 1L),
-            ("Order", "ORD-", 1L)
-        })
+            Id = Guid.CreateVersion7(),
+            TenantId = tenant.Id,
+            Code = "CUS-0001",
+            FullName = "Juan Dela Cruz",
+            Phone = "09171234567",
+            IsActive = true
+        };
+
+        var address = new CustomerAddress
+        {
+            Id = Guid.CreateVersion7(),
+            TenantId = tenant.Id,
+            CustomerId = customer.Id,
+            RecipientName = "Juan Dela Cruz",
+            Line1 = "123 Rizal St",
+            City = "Calamba",
+            Province = "Laguna",
+            CountryCode = "PH",
+            IsDefault = true
+        };
+
+        foreach (var (key, prefix) in DocumentSequenceDefaults.All)
         {
             db.DocumentSequences.Add(new DocumentSequence
             {
@@ -99,15 +146,18 @@ public class DbSeeder(ApplicationDbContext db, IPasswordService passwords)
                 TenantId = tenant.Id,
                 SequenceKey = key,
                 Prefix = prefix,
-                NextValue = next,
+                // Member and Customer: code 0001 is assigned by hand to the seeded rows
+                NextValue = key is DocumentSequenceKeys.Member or DocumentSequenceKeys.Customer ? 2 : 1,
                 Padding = 4
             });
         }
-        
+
         db.Tenants.Add(tenant);
         db.Users.Add(user);
         db.TenantMembers.Add(member);
         db.MemberRoles.Add(new MemberRole { MemberId = member.Id, RoleId = OwnerRoleId });
+        db.Customers.Add(customer);
+        db.CustomerAddresses.Add(address);
 
         await db.SaveChangesAsync(ct);
     }

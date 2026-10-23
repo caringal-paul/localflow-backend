@@ -34,10 +34,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("AllowedChannels")
-                        .HasColumnType("integer")
-                        .HasColumnName("allowed_channels");
-
                     b.Property<string>("AlternatePhone")
                         .HasColumnType("text")
                         .HasColumnName("alternate_phone");
@@ -222,6 +218,70 @@ namespace Infrastructure.Migrations
                         .HasDatabaseName("ix_customer_addresses_tenant_id");
 
                     b.ToTable("customer_addresses", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CustomerPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("AllowEmail")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allow_email");
+
+                    b.Property<bool>("AllowPush")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allow_push");
+
+                    b.Property<bool>("AllowSms")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allow_sms");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_customer_preferences");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_customer_preferences_customer_id")
+                        .HasFilter("is_deleted = false");
+
+                    b.ToTable("customer_preferences", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DocumentSequence", b =>
@@ -1502,6 +1562,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CustomerPreference", b =>
+                {
+                    b.HasOne("Domain.Entities.Customer", "Customer")
+                        .WithOne("Preference")
+                        .HasForeignKey("Domain.Entities.CustomerPreference", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_customer_preferences_customers_customer_id");
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Domain.Entities.DocumentSequence", b =>
                 {
                     b.HasOne("Domain.Entities.Tenant", "Tenant")
@@ -1753,6 +1825,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Preference");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>

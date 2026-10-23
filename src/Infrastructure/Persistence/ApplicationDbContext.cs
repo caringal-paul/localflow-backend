@@ -24,6 +24,7 @@ public class ApplicationDbContext(
     public DbSet<MemberRole> MemberRoles => Set<MemberRole>();
     public DbSet<UserInvitation> UserInvitations => Set<UserInvitation>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<Product> Products => Set<Product>();
